@@ -1,14 +1,11 @@
-name: Build Imaner Alo Voice Studio APK
-
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - "main.py"
-      - "buildozer.spec"
-      - ".github/workflows/build.yml"
+- name: Set up Android SDK
+  uses: android-actions/setup-android@v3
+  with:
+    packages: |
+      platform-tools
+      build-tools;35.0.0
+      platforms;android-35
+    accept-android-sdk-licenses: true
 
 permissions:
   contents: read
@@ -47,13 +44,13 @@ jobs:
           accept-android-sdk-licenses: true
 
       - name: Configure Android SDK
-        run: |
-          echo "ANDROIDSDK=$ANDROID_HOME" >> "$GITHUB_ENV"
-          echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
-          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> "$GITHUB_ENV"
-          mkdir -p "$HOME/.android"
-          touch "$HOME/.android/repositories.cfg"
-          sdkmanager --licenses
+  run: |
+    echo "ANDROIDSDK=$ANDROID_HOME" >> "$GITHUB_ENV"
+    echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
+    echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> "$GITHUB_ENV"
+    mkdir -p "$HOME/.android"
+    touch "$HOME/.android/repositories.cfg"
+    yes | sdkmanager --licenses
 
       - name: Install Python build tools
         run: |
