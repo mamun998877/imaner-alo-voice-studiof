@@ -16,7 +16,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-22.04
-    timeout-minutes: 60
+    timeout-minutes: 90
 
     steps:
       - name: Checkout repository
@@ -36,33 +36,35 @@ jobs:
             autoconf automake libtool \
             pkg-config zlib1g-dev \
             libncurses5-dev libncursesw5-dev \
-            libtinfo5 cmake \
-            libffi-dev libssl-dev \
-            build-essential ccache \
-            libltdl-dev
+            cmake libffi-dev libssl-dev \
+            build-essential ccache libltdl-dev
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          api-level: 35
+          build-tools: 35.0.0
+          accept-android-sdk-licenses: true
+
+      - name: Configure Android SDK
+        run: |
+          echo "ANDROIDSDK=$ANDROID_HOME" >> "$GITHUB_ENV"
+          echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> "$GITHUB_ENV"
+          mkdir -p "$HOME/.android"
+          touch "$HOME/.android/repositories.cfg"
+          sdkmanager --licenses
 
       - name: Install Python build tools
         run: |
           python -m pip install --upgrade pip
-          pip install buildozer cython==0.29.33
-
-      - name: Accept Android SDK Licenses
-        run: |
-          mkdir -p "$HOME/.android"
-          touch "$HOME/.android/repositories.cfg"
-          yes | sdkmanager --licenses || true
-
-      - name: Install Android Build Tools
-        run: |
-          sdkmanager "platform-tools" \
-            "platforms;android-35" \
-            "build-tools;35.0.0"
+          python -m pip install \
+            "buildozer==1.5.0" \
+            "Cython==0.29.33"
 
       - name: Build Android APK
-        env:
-          ANDROID_ACCEPT_SDK_LICENSE: "1"
         run: |
-          yes | buildozer -v android debug
+          buildozer -v android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
