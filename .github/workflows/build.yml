@@ -58,14 +58,13 @@ jobs:
           javac -version
           python --version
 
-      - name: Set up Android SDK
+            - name: Set up Android SDK
         uses: android-actions/setup-android@v3
-        with:
-          packages: |
-            platform-tools
-            build-tools;35.0.0
-            platforms;android-35
-          accept-android-sdk-licenses: true
+
+      - name: Install Android SDK packages
+        run: |
+          yes | sdkmanager --licenses || true
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Configure Android environment
         run: |
