@@ -59,12 +59,16 @@ jobs:
           python --version
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+      - name: Accept Android SDK licenses
+        run: |
+          yes | sdkmanager --licenses || true
+
       - name: Install Android SDK packages
         run: |
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --sdk_root="$ANDROID_HOME" "platform-tools" "platforms;android-35" "build-tools;35.0.0"
-      - name: Install Android SDK packages
-        run: |
-          sdkmanager --sdk_root="$ANDROID_HOME" "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+          sdkmanager --sdk_root="$ANDROID_HOME" \
+            "platform-tools" \
+            "platforms;android-35" \
+            "build-tools;35.0.0"
       - name: Configure Android environment
         run: |
           echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
